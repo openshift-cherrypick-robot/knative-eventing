@@ -40,10 +40,16 @@ EOF
 image_deps=$(print_image_dependencies)
 
 cat <<EOF
-tag_specification:
-  cluster: https://api.ci.openshift.org
-  name: '$openshift'
-  namespace: ocp
+releases:
+  initial:
+    integration:
+      name: '$openshift'
+      namespace: ocp
+  latest:
+    integration:
+      include_built_images: true
+      name: '$openshift'
+      namespace: ocp
 promotion:
   additional_images:
     knative-eventing-src: src
