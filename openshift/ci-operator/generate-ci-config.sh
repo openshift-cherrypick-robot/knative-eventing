@@ -3,9 +3,13 @@
 branch=${1-'knative-v0.6.0'}
 openshift=${2-'4.3'}
 promotion_disabled=${3-false}
+generate_continuous=true
 
 if [[ "$branch" == "knative-next" ]]; then
-    branch="knative-nightly"
+  promotion_name="knative-nightly"
+  generate_continuous=false
+else
+  promotion_name="$branch.0"
 fi
 
 core_images=$(find ./openshift/ci-operator/knative-images -mindepth 1 -maxdepth 1 -type d | LC_COLLATE=posix sort)
@@ -40,26 +44,9 @@ EOF
 image_deps=$(print_image_dependencies)
 
 cat <<EOF
-releases:
-  initial:
-    integration:
-      name: '$openshift'
-      namespace: ocp
-  latest:
-    integration:
-      include_built_images: true
-      name: '$openshift'
-      namespace: ocp
-promotion:
-  additional_images:
-    knative-eventing-src: src
-  disabled: $promotion_disabled
-  cluster: https://api.ci.openshift.org
-  namespace: openshift
-  name: $branch.0
 base_images:
   base:
-    name: '$openshift'
+    name: "$openshift"
     namespace: ocp
     tag: base
 build_root:
@@ -79,7 +66,7 @@ cat <<EOF
     owner: openshift-ci
     product: ocp
     timeout: 1h0m0s
-    version: "4.8"
+    version: "$openshift"
   steps:
     test:
     - as: test
@@ -135,6 +122,9 @@ $image_deps
           cpu: 100m
       timeout: 4h0m0s
     workflow: generic-claim
+EOF
+  if [[ "$generate_continuous" == true ]]; then
+    cat <<EOF
 - as: e2e-aws-ocp-${openshift//./}-continuous
   cluster_claim:
     architecture: amd64
@@ -158,6 +148,7 @@ $image_deps
       timeout: 4h0m0s
     workflow: generic-claim
 EOF
+  fi
 else
 cat <<EOF
 - as: e2e-aws-ocp-${openshift//./}
@@ -205,6 +196,9 @@ $image_deps
           cpu: 100m
       timeout: 4h0m0s
     workflow: ipi-aws
+EOF
+  if [[ "$generate_continuous" == true ]]; then
+    cat <<EOF
 - as: e2e-aws-ocp-${openshift//./}-continuous
   cron: 0 */12 * * 1-5
   steps:
@@ -222,8 +216,26 @@ $image_deps
       timeout: 4h0m0s
     workflow: ipi-aws
 EOF
+  fi
 fi
 cat <<EOF
+releases:
+  initial:
+    integration:
+      name: '$openshift'
+      namespace: ocp
+  latest:
+    integration:
+      include_built_images: true
+      name: '$openshift'
+      namespace: ocp
+promotion:
+  additional_images:
+    knative-eventing-src: src
+  disabled: $promotion_disabled
+  cluster: https://api.ci.openshift.org
+  namespace: openshift
+  name: $promotion_name
 resources:
   '*':
     limits:
