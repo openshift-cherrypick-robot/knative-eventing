@@ -80,7 +80,7 @@ if [[ "$VERSION" != "next" ]]; then
   echo "==== Adding reporter_config to periodics ===="
   # These version MUST match the ocp version we used above
   for OCP_VERSION in 47 48; do
-      sed -i "/  name: periodic-ci-openshift-knative-eventing-release-${VERSION}-${OCP_VERSION}-e2e-aws-ocp-${OCP_VERSION}-continuous\n  spec:/ r $TMPDIR/reporterConfig" "$PERIODIC_CONFIG"
+      sed -i "/  name: periodic-ci-openshift-knative-eventing-release-${VERSION}-${OCP_VERSION}-e2e-aws-ocp-${OCP_VERSION}-continuous/ r $TMPDIR/reporterConfig" "$PERIODIC_CONFIG"
   done
 fi
 echo "==== Changes made to $OPENSHIFT ===="
