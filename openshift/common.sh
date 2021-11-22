@@ -61,6 +61,7 @@ function step_error() {
   box_sub_text $*
 }
 
+# Prints a warning step message in yellow.
 function step_warn() {
   MSG=$*
   printf "${YELLOW}│─── "
@@ -68,6 +69,7 @@ function step_warn() {
   printf "\n"
 }
 
+# Prints a stage warning header message of max 120 ch in yellow. 
 function stage_warn() {
   MSG=$*
   MSG_SIZE=${#MSG}
