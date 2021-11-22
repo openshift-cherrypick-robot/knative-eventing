@@ -2,6 +2,9 @@
 # A script that will update the mapping file in github.com/openshift/release
 
 set -e
+
+source "$(dirname "$0")/../tui-functions.sh"
+
 readonly TMPDIR=$(mktemp -d knativeEventingPeriodicReporterXXXX -p /tmp/)
 
 fail() { echo; echo "$*"; exit 1; }
@@ -31,6 +34,7 @@ PERIODIC_CONFIGDIR=$OPENSHIFT/ci-operator/jobs/openshift/knative-eventing
 test -d "$PERIODIC_CONFIGDIR" || fail "'$PERIODIC_CONFIGDIR' is not a directory"
 
 # Generate CI config files
+stage "Generating CI config files"
 CONFIG=$CONFIGDIR/openshift-knative-eventing-release-$VERSION
 PERIODIC_CONFIG=$PERIODIC_CONFIGDIR/openshift-knative-eventing-release-$VERSION-periodics.yaml
 CURDIR=$(dirname $0)
@@ -40,6 +44,7 @@ $CURDIR/generate-ci-config.sh knative-$VERSION 4.9 true > ${CONFIG}__49.yaml
 
 # Append missing lines to the mirror file.
 if [[ "$VERSION" != "next" ]]; then
+  stage "Syncing mirror file"
   VER=$(echo $VERSION | sed 's/\./_/;s/\.[0-9]\+$//') # X_Y form of version
   MIRROR="$OPENSHIFT/core-services/image-mirroring/knative/mapping_knative_${VER}_quay"
   [ -n "$(tail -c1 $MIRROR)" ] && echo >> $MIRROR # Make sure there's a newline
@@ -47,24 +52,25 @@ if [[ "$VERSION" != "next" ]]; then
   for IMAGE in $test_images; do
       NAME=knative-eventing-test-$(basename $IMAGE | sed 's/_/-/' | sed 's/_/-/' | sed 's/[_.]/-/' | sed 's/[_.]/-/' | sed 's/v0/upgrade-v0/')
 
-      echo "Adding $NAME to mirror file as $VERSION tag"
+      step "Adding $NAME to mirror file as $VERSION tag"
       LINE="registry.ci.openshift.org/openshift/knative-$VERSION.0:$NAME quay.io/openshift-knative/${NAME/knative-eventing-test-/}:$VERSION"
       # Add $LINE if not already present
       grep -q "^$LINE\$" $MIRROR || echo "$LINE"  >> $MIRROR
 
       VER=$(echo $VER | sed 's/\_/./')
-      echo "Adding $NAME to mirror file as $VER tag"
+      step "Adding $NAME to mirror file as $VER tag"
       LINE="registry.ci.openshift.org/openshift/knative-$VERSION.0:$NAME quay.io/openshift-knative/${NAME/knative-eventing-test-/}:$VER"
       # Add $LINE if not already present
       grep -q "^$LINE\$" $MIRROR || echo "$LINE"  >> $MIRROR
   done
 else
+  stage "Syncing mirror file"
   MIRROR="$OPENSHIFT/core-services/image-mirroring/knative/mapping_knative_nightly_quay"
   [ -n "$(tail -c1 $MIRROR)" ] && echo >> $MIRROR # Make sure there's a newline
   test_images=$(find ./openshift/ci-operator/knative-test-images -mindepth 1 -maxdepth 1 -type d | LC_COLLATE=posix sort)
   for IMAGE in $test_images; do
       NAME=knative-eventing-test-$(basename $IMAGE | sed 's/_/-/' | sed 's/_/-/' | sed 's/[_.]/-/' | sed 's/[_.]/-/' | sed 's/v0/upgrade-v0/')
-      echo "Adding $NAME to mirror file as latest tag"
+      step "Adding $NAME to mirror file as latest tag"
       LINE="registry.ci.openshift.org/openshift/knative-nightly:$NAME quay.io/openshift-knative/${NAME/knative-eventing-test-/}:latest"
       # Add $LINE if not already present
       grep -q "^$LINE\$" $MIRROR || echo "$LINE"  >> $MIRROR
@@ -72,17 +78,33 @@ else
 fi
 # Switch to openshift/release to generate PROW files
 cd $OPENSHIFT
-echo "Generating PROW files in $OPENSHIFT"
+stage "Generating PROW job in $OPENSHIFT"
 make jobs
+stage "Generating ci-operator-config in $OPENSHIFT"
 make ci-operator-config
 # We have to do this manually, see: https://docs.ci.openshift.org/docs/how-tos/notification/
 if [[ "$VERSION" != "next" ]]; then
-  echo "==== Adding reporter_config to periodics ===="
+  stage "Adding reporter_config to periodics"
   # These version MUST match the ocp version we used above
   for OCP_VERSION in 47 48; do
-      sed -i "/  name: periodic-ci-openshift-knative-eventing-release-${VERSION}-${OCP_VERSION}-e2e-aws-ocp-${OCP_VERSION}-continuous/ r $TMPDIR/reporterConfig" "$PERIODIC_CONFIG"
+    JOB="periodic-ci-openshift-knative-eventing-release-${VERSION}-${OCP_VERSION}-e2e-aws-ocp-${OCP_VERSION}-continuous"  
+    if [[ $(sed -n "/  name: $JOB/ r $TMPDIR/reporterConfig" "$PERIODIC_CONFIG") ]]; then
+      sed -i "/  name: $JOB/ r $TMPDIR/reporterConfig" "$PERIODIC_CONFIG"
+      step "Updating job $JOB - Done."
+    else
+      step_error "Updating job $JOB - Failed."
+    fi
   done
 fi
-echo "==== Changes made to $OPENSHIFT ===="
-git status
-echo "==== Commit changes to $OPENSHIFT and create a PR"
+stage "Summary"
+GIT_OUTPUT=$(git ls-files --modified)
+if [[ -n "${GIT_OUTPUT}" ]]; then
+  step "Modified files in $OPENSHIFT"
+  git ls-files --modified
+fi
+GIT_OUTPUT=$(git ls-files --others --exclude-standard)
+if [[ -n "${GIT_OUTPUT}" ]]; then
+  step "New files in $OPENSHIFT"
+  git ls-files --others --exclude-standard 
+fi
+stage_warn "Commit changes to $OPENSHIFT and create a PR"
