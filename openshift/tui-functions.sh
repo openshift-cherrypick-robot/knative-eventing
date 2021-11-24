@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
 
 # Colors
-COLOR_OFF='\033[0m'       # Text Reset
-RED='\033[0;31m'          # Red
-GREEN='\033[0;32m'        # Green
-YELLOW='\033[0;93m'        # Green
-COLOR=""                  # Points to current set color
-
+COLOR_OFF='\033[0m' # Text Reset
+RED='\033[0;31m'    # Red
+GREEN='\033[0;32m'  # Green
+YELLOW='\033[0;93m' # Yello
+COLOR=""            # Points to current set color
 
 # Use the following functions to help printing your script output in a more user-friendly and readable
 # format. If you group your script's logic into a set of logical stages, each executing a set of steps,
 # then use the 'stage' function to print the main stage message, then the 'step' for each step message
 # and step_error for each step error message.
-
 
 # Prints its argument within a box.
 # It supports a maximum message of 120 characters.
@@ -22,15 +20,15 @@ function text_box() {
   MSG_SIZE=${#MSG}
   [[ $MSG_SIZE -lt 60 ]] && WIDTH=60 || WIDTH=120
   printf "┌"
-  printf "─%.0s"  $(seq 1 $WIDTH)
+  printf "─%.0s" $(seq 1 $WIDTH)
   printf "┐"
   printf "\n│ "
-  (( PADDING=($WIDTH - $MSG_SIZE)-1))
+  ((PADDING = ($WIDTH - $MSG_SIZE) - 1))
   printf "${COLOR}${MSG}${COLOR_OFF}"
-  printf " %.0s"  $(seq 1 $PADDING)
+  printf " %.0s" $(seq 1 $PADDING)
   printf "│\n"
   printf "└"
-  printf "─%.0s"  $(seq 1 $WIDTH)
+  printf "─%.0s" $(seq 1 $WIDTH)
   printf "┘"
   printf "\n"
 }
@@ -43,7 +41,7 @@ function box_sub_text() {
   printf "\n"
 }
 
-# Prints a stage header message of max 120 ch in green. 
+# Prints a stage header message of max 120 ch in green.
 function stage() {
   COLOR=$GREEN
   text_box "${*}..."
@@ -69,21 +67,21 @@ function step_warn() {
   printf "\n"
 }
 
-# Prints a stage warning header message of max 120 ch in yellow. 
+# Prints a stage warning header message of max 120 ch in yellow.
 function stage_warn() {
   MSG=$*
   MSG_SIZE=${#MSG}
   [[ $MSG_SIZE -lt 60 ]] && WIDTH=60 || WIDTH=120
   printf "${YELLOW}┌"
-  printf "─%.0s"  $(seq 1 $WIDTH)
+  printf "─%.0s" $(seq 1 $WIDTH)
   printf "┐"
   printf "\n│ ${COLOR_OFF}"
-  (( PADDING=($WIDTH - $MSG_SIZE)-1))
+  ((PADDING = ($WIDTH - $MSG_SIZE) - 1))
   printf "${MSG}"
-  printf " %.0s"  $(seq 1 $PADDING)
+  printf " %.0s" $(seq 1 $PADDING)
   printf "${YELLOW}│\n"
   printf "└"
-  printf "─%.0s"  $(seq 1 $WIDTH)
+  printf "─%.0s" $(seq 1 $WIDTH)
   printf "┘${COLOR_OFF}"
   printf "\n"
 }
