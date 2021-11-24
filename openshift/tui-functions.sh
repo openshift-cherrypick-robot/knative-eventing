@@ -4,7 +4,7 @@
 COLOR_OFF='\033[0m' # Text Reset
 RED='\033[0;31m'    # Red
 GREEN='\033[0;32m'  # Green
-YELLOW='\033[0;93m' # Yello
+YELLOW='\033[0;93m' # Yellow
 COLOR=""            # Points to current set color
 
 # Use the following functions to help printing your script output in a more user-friendly and readable
