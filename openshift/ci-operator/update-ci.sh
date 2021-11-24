@@ -82,6 +82,7 @@ stage "Generating PROW job in $OPENSHIFT"
 make jobs
 stage "Generating ci-operator-config in $OPENSHIFT"
 make ci-operator-config
+RERUN_MAKE=false
 # We have to do this manually, see: https://docs.ci.openshift.org/docs/how-tos/notification/
 if [[ "$VERSION" != "next" ]]; then
   stage "Adding reporter_config to periodics"
@@ -90,12 +91,21 @@ if [[ "$VERSION" != "next" ]]; then
     JOB="periodic-ci-openshift-knative-eventing-release-${VERSION}-${OCP_VERSION}-e2e-aws-ocp-${OCP_VERSION}-continuous"  
     if [[ $(sed -n "/  name: $JOB/ r $TMPDIR/reporterConfig" "$PERIODIC_CONFIG") ]]; then
       sed -i "/  name: $JOB/ r $TMPDIR/reporterConfig" "$PERIODIC_CONFIG"
+      RERUN_MAKE=true
       step "Updating job $JOB - Done."
     else
       step_error "Updating job $JOB - Failed."
     fi
   done
 fi
+
+if [[ "$RERUN_MAKE" == "true" ]]; then
+  # One last run to format any manual changes to the jobs
+  stage "Generating PROW job in $OPENSHIFT"
+  step "Running make job again to format any manually added configuration"
+  make jobs
+fi
+
 stage "Summary"
 GIT_OUTPUT=$(git ls-files --modified)
 if [[ -n "${GIT_OUTPUT}" ]]; then
