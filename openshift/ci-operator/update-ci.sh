@@ -87,7 +87,7 @@ RERUN_MAKE=false
 if [[ "$VERSION" != "next" ]]; then
   stage "Adding reporter_config to periodics"
   # These version MUST match the ocp version we used above
-  for OCP_VERSION in 47 48; do
+  for OCP_VERSION in 47 48 49; do
     JOB="periodic-ci-openshift-knative-eventing-release-${VERSION}-${OCP_VERSION}-e2e-aws-ocp-${OCP_VERSION}-continuous"  
     if [[ $(sed -n "/  name: $JOB/ r $TMPDIR/reporterConfig" "$PERIODIC_CONFIG") ]]; then
       sed -i "/  name: $JOB/ r $TMPDIR/reporterConfig" "$PERIODIC_CONFIG"
