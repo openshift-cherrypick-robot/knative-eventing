@@ -25,7 +25,7 @@ PATCH_DIR="openshift/patches"
 if [ -d "openshift/patches-${release}" ]; then
     PATCH_DIR="openshift/patches-${release}"
     # Update the nightly test images to actual versioned images
-    sed -i "s/knative-nightly:knative/knative-${release}:knative/g" openshift/patches/*.patch
+    sed -i "s/knative-nightly:knative/knative-${release}:knative/g" ${PATCH_DIR}/*.patch
 fi
 git apply $PATCH_DIR/*
 make RELEASE=$release generate-release
