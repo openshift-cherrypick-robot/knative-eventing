@@ -38,9 +38,9 @@ stage "Generating CI config files"
 CONFIG=$CONFIGDIR/openshift-knative-eventing-release-$VERSION
 PERIODIC_CONFIG=$PERIODIC_CONFIGDIR/openshift-knative-eventing-release-$VERSION-periodics.yaml
 CURDIR=$(dirname $0)
-$CURDIR/generate-ci-config.sh knative-$VERSION 4.7 > ${CONFIG}__47.yaml
-$CURDIR/generate-ci-config.sh knative-$VERSION 4.8 true > ${CONFIG}__48.yaml
-$CURDIR/generate-ci-config.sh knative-$VERSION 4.9 true > ${CONFIG}__49.yaml
+$CURDIR/generate-ci-config.sh knative-$VERSION 4.7 false false > ${CONFIG}__47.yaml
+$CURDIR/generate-ci-config.sh knative-$VERSION 4.8 true false > ${CONFIG}__48.yaml
+$CURDIR/generate-ci-config.sh knative-$VERSION 4.9 true true > ${CONFIG}__49.yaml
 
 # Append missing lines to the mirror file.
 if [[ "$VERSION" != "next" ]]; then
