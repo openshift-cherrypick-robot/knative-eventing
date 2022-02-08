@@ -3,7 +3,7 @@
 branch=${1-'knative-v0.6.0'}
 openshift=${2-'4.3'}
 promotion_disabled=${3-false}
-generate_continuous=true
+generate_continuous=${4-false}
 
 if [[ "$branch" == "knative-next" ]]; then
   promotion_name="knative-nightly"
