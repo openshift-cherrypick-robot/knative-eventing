@@ -66,13 +66,6 @@ function print_not_openshift_47 {
   cat <<EOF
 tests:
 - as: e2e-aws-ocp-${openshift//./}
-  cluster_claim:
-    architecture: amd64
-    cloud: aws
-    owner: openshift-ci
-    product: ocp
-    timeout: 1h0m0s
-    version: "$openshift"
   steps:
     test:
     - as: test
@@ -86,7 +79,6 @@ $image_deps
           cpu: 100m
       timeout: 4h0m0s
     workflow: generic-claim
-- as: conformance-aws-ocp-${openshift//./}
   cluster_claim:
     architecture: amd64
     cloud: aws
@@ -94,6 +86,7 @@ $image_deps
     product: ocp
     timeout: 1h0m0s
     version: "$openshift"
+- as: conformance-aws-ocp-${openshift//./}
   steps:
     test:
     - as: test
@@ -107,7 +100,6 @@ $image_deps
           cpu: 100m
       timeout: 4h0m0s
     workflow: generic-claim
-- as: reconciler-aws-ocp-${openshift//./}
   cluster_claim:
     architecture: amd64
     cloud: aws
@@ -115,6 +107,7 @@ $image_deps
     product: ocp
     timeout: 1h0m0s
     version: "$openshift"
+- as: reconciler-aws-ocp-${openshift//./}
   steps:
     test:
     - as: test
@@ -128,12 +121,6 @@ $image_deps
           cpu: 100m
       timeout: 4h0m0s
     workflow: generic-claim
-EOF
-
-
-    if [[ "$generate_continuous" == true ]]; then
-      cat <<EOF
-- as: e2e-aws-ocp-${openshift//./}-continuous
   cluster_claim:
     architecture: amd64
     cloud: aws
@@ -141,6 +128,12 @@ EOF
     product: ocp
     timeout: 1h0m0s
     version: "$openshift"
+EOF
+
+
+    if [[ "$generate_continuous" == true ]]; then
+      cat <<EOF
+- as: e2e-aws-ocp-${openshift//./}-continuous
   cron: 0 */12 * * 1-5
   steps:
     test:
@@ -155,6 +148,13 @@ $image_deps
           cpu: 100m
       timeout: 4h0m0s
     workflow: generic-claim
+  cluster_claim:
+    architecture: amd64
+    cloud: aws
+    owner: openshift-ci
+    product: ocp
+    timeout: 1h0m0s
+    version: "$openshift"
 EOF
 fi
 }
@@ -164,7 +164,6 @@ function print_openshift_47 {
 tests:
 - as: e2e-aws-ocp-${openshift//./}
   steps:
-    cluster_profile: aws
     test:
     - as: test
       cli: latest
@@ -176,10 +175,10 @@ $image_deps
         requests:
           cpu: 100m
       timeout: 4h0m0s
+    cluster_profile: aws
     workflow: ipi-aws
 - as: conformance-aws-ocp-${openshift//./}
   steps:
-    cluster_profile: aws
     test:
     - as: test
       cli: latest
@@ -191,10 +190,10 @@ $image_deps
         requests:
           cpu: 100m
       timeout: 4h0m0s
+    cluster_profile: aws
     workflow: ipi-aws
 - as: reconciler-aws-ocp-${openshift//./}
   steps:
-    cluster_profile: aws
     test:
     - as: test
       cli: latest
@@ -206,6 +205,7 @@ $image_deps
         requests:
           cpu: 100m
       timeout: 4h0m0s
+    cluster_profile: aws
     workflow: ipi-aws
 EOF
     if [[ "$generate_continuous" == true ]]; then
@@ -213,7 +213,6 @@ EOF
 - as: e2e-aws-ocp-${openshift//./}-continuous
   cron: 0 */12 * * 1-5
   steps:
-    cluster_profile: aws
     test:
     - as: test
       cli: latest
@@ -225,6 +224,7 @@ $image_deps
         requests:
           cpu: 100m
       timeout: 4h0m0s
+    cluster_profile: aws
     workflow: ipi-aws
 EOF
     fi
