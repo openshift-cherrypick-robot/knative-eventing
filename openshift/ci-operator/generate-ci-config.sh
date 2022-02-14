@@ -41,24 +41,29 @@ EOF
   done
 }
 
-image_deps=$(print_image_dependencies)
-
-cat <<EOF
+function print_base_images {
+  cat <<EOF
 base_images:
   base:
     name: "$openshift"
     namespace: ocp
     tag: base
+EOF
+}
+
+function print_build_root {
+  cat <<EOF
 build_root:
   project_image:
     dockerfile_path: openshift/ci-operator/build-image/Dockerfile
 canonical_go_repository: knative.dev/eventing
 binary_build_commands: make install
 test_binary_build_commands: make test-install
-tests:
 EOF
-if [[ "$openshift" != "4.7" ]]; then
-cat <<EOF
+}
+
+function print_not_openshift_47 {
+  cat <<EOF
 - as: e2e-aws-ocp-${openshift//./}
   cluster_claim:
     architecture: amd64
@@ -123,8 +128,10 @@ $image_deps
       timeout: 4h0m0s
     workflow: generic-claim
 EOF
-  if [[ "$generate_continuous" == true ]]; then
-    cat <<EOF
+
+
+    if [[ "$generate_continuous" == true ]]; then
+      cat <<EOF
 - as: e2e-aws-ocp-${openshift//./}-continuous
   cluster_claim:
     architecture: amd64
@@ -148,77 +155,82 @@ $image_deps
       timeout: 4h0m0s
     workflow: generic-claim
 EOF
-  fi
-else
-cat <<EOF
-- as: e2e-aws-ocp-${openshift//./}
-  steps:
-    cluster_profile: aws
-    test:
-    - as: test
-      cli: latest
-      commands: make test-e2e
-      dependencies:
-$image_deps
-      from: src
-      resources:
-        requests:
-          cpu: 100m
-      timeout: 4h0m0s
-    workflow: ipi-aws
-- as: conformance-aws-ocp-${openshift//./}
-  steps:
-    cluster_profile: aws
-    test:
-    - as: test
-      cli: latest
-      commands: make test-conformance
-      dependencies:
-$image_deps
-      from: src
-      resources:
-        requests:
-          cpu: 100m
-      timeout: 4h0m0s
-    workflow: ipi-aws
-- as: reconciler-aws-ocp-${openshift//./}
-  steps:
-    cluster_profile: aws
-    test:
-    - as: test
-      cli: latest
-      commands: make test-reconciler
-      dependencies:
-$image_deps
-      from: src
-      resources:
-        requests:
-          cpu: 100m
-      timeout: 4h0m0s
-    workflow: ipi-aws
-EOF
-  if [[ "$generate_continuous" == true ]]; then
-    cat <<EOF
-- as: e2e-aws-ocp-${openshift//./}-continuous
-  cron: 0 */12 * * 1-5
-  steps:
-    cluster_profile: aws
-    test:
-    - as: test
-      cli: latest
-      commands: make test-e2e
-      dependencies:
-$image_deps
-      from: src
-      resources:
-        requests:
-          cpu: 100m
-      timeout: 4h0m0s
-    workflow: ipi-aws
-EOF
-  fi
 fi
-cat <<EOF
+}
+
+function print_openshift_47 {
+  cat <<EOF
+- as: e2e-aws-ocp-${openshift//./}
+  steps:
+    cluster_profile: aws
+    test:
+    - as: test
+      cli: latest
+      commands: make test-e2e
+      dependencies:
+$image_deps
+      from: src
+      resources:
+        requests:
+          cpu: 100m
+      timeout: 4h0m0s
+    workflow: ipi-aws
+- as: conformance-aws-ocp-${openshift//./}
+  steps:
+    cluster_profile: aws
+    test:
+    - as: test
+      cli: latest
+      commands: make test-conformance
+      dependencies:
+$image_deps
+      from: src
+      resources:
+        requests:
+          cpu: 100m
+      timeout: 4h0m0s
+    workflow: ipi-aws
+- as: reconciler-aws-ocp-${openshift//./}
+  steps:
+    cluster_profile: aws
+    test:
+    - as: test
+      cli: latest
+      commands: make test-reconciler
+      dependencies:
+$image_deps
+      from: src
+      resources:
+        requests:
+          cpu: 100m
+      timeout: 4h0m0s
+    workflow: ipi-aws
+EOF
+    if [[ "$generate_continuous" == true ]]; then
+      cat <<EOF
+- as: e2e-aws-ocp-${openshift//./}-continuous
+  cron: 0 */12 * * 1-5
+  steps:
+    cluster_profile: aws
+    test:
+    - as: test
+      cli: latest
+      commands: make test-e2e
+      dependencies:
+$image_deps
+      from: src
+      resources:
+        requests:
+          cpu: 100m
+      timeout: 4h0m0s
+    workflow: ipi-aws
+EOF
+    fi
+
+}
+
+function print_releases {
+  cat <<EOF
 releases:
   initial:
     integration:
@@ -229,6 +241,11 @@ releases:
       include_built_images: true
       name: '$openshift'
       namespace: ocp
+EOF
+}
+
+function print_promotion {
+  cat <<EOF
 promotion:
   additional_images:
     knative-eventing-src: src
@@ -236,6 +253,11 @@ promotion:
   cluster: https://api.ci.openshift.org
   namespace: openshift
   name: $promotion_name
+EOF
+}
+
+function print_resources {
+  cat <<EOF
 resources:
   '*':
     limits:
@@ -249,7 +271,11 @@ resources:
     requests:
       cpu: 500m
       memory: 2Gi
+EOF
+}
 
+function print_images {
+  cat <<EOF
 images:
 EOF
 
@@ -284,3 +310,25 @@ for img in $test_images; do
   to: knative-eventing-test-$to_image
 EOF
 done
+}
+
+image_deps=$(print_image_dependencies)
+
+print_base_images
+print_build_root
+
+cat <<EOF
+tests:
+EOF
+
+#
+if [[ "$openshift" != "4.7" ]]; then
+  print_not_openshift_47
+else
+  print_openshift_47
+fi
+
+print_releases
+print_promotion
+print_resources
+print_images
