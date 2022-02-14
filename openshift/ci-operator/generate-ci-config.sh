@@ -231,6 +231,14 @@ EOF
 
 }
 
+function print_tests {
+  if [[ "$openshift" != "4.7" ]]; then
+    print_not_openshift_47
+  else
+    print_openshift_47
+  fi
+}
+
 function print_releases {
   cat <<EOF
 releases:
@@ -318,14 +326,7 @@ image_deps=$(generate_image_dependencies)
 
 print_base_images
 print_build_root
-
-#
-if [[ "$openshift" != "4.7" ]]; then
-  print_not_openshift_47
-else
-  print_openshift_47
-fi
-
+print_tests
 print_releases
 print_promotion
 print_resources
