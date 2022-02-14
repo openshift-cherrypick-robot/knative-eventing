@@ -15,7 +15,7 @@ fi
 core_images=$(find ./openshift/ci-operator/knative-images -mindepth 1 -maxdepth 1 -type d | LC_COLLATE=posix sort)
 test_images=$(find ./openshift/ci-operator/knative-test-images -mindepth 1 -maxdepth 1 -type d | LC_COLLATE=posix sort)
 
-function print_image_dependencies {
+function generate_image_dependencies {
   for img in $core_images; do
     image_base=knative-eventing-$(basename $img)
     to_image=$(echo ${image_base//[_.]/-})
@@ -312,7 +312,7 @@ EOF
 done
 }
 
-image_deps=$(print_image_dependencies)
+image_deps=$(generate_image_dependencies)
 
 print_base_images
 print_build_root
