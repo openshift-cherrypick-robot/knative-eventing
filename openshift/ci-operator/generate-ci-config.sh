@@ -64,6 +64,7 @@ EOF
 
 function print_not_openshift_47 {
   cat <<EOF
+tests:
 - as: e2e-aws-ocp-${openshift//./}
   cluster_claim:
     architecture: amd64
@@ -160,6 +161,7 @@ fi
 
 function print_openshift_47 {
   cat <<EOF
+tests:
 - as: e2e-aws-ocp-${openshift//./}
   steps:
     cluster_profile: aws
@@ -316,10 +318,6 @@ image_deps=$(generate_image_dependencies)
 
 print_base_images
 print_build_root
-
-cat <<EOF
-tests:
-EOF
 
 #
 if [[ "$openshift" != "4.7" ]]; then
