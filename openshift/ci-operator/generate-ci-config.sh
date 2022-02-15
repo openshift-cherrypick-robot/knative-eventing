@@ -81,7 +81,7 @@ cat <<EOF
     owner: openshift-ci
     product: ocp
     timeout: 1h0m0s
-    version: "4.8"
+    version: "$openshift"
 EOF
 fi
 
