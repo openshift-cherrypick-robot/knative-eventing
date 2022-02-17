@@ -41,6 +41,20 @@ EOF
   done
 }
 
+function generate_cron_expression {
+  if [[ "$branch" == "knative-v0.25.3" ]]; then
+    echo '0 1 * * 1-5'
+  elif [[ "$branch" == "knative-v0.26" ]]; then
+    echo '0 3 * * 1-5'
+  elif [[ "$branch" == "knative-v1.0" ]]; then
+    echo '0 5 * * 1-5'
+  elif [[ "$branch" == "knative-v1.1" ]]; then
+    echo '0 7 * * 1-5'
+  elif [[ "$branch" == "knative-v1.2" ]]; then
+    echo '0 9 * * 1-5'
+  fi
+}
+
 function print_single_test {
   local name=${1}
   local commands=${2}
@@ -115,22 +129,26 @@ EOF
 }
 
 function print_openshift_47_tests {
+  cron="$(generate_cron_expression)"
+
   print_single_test    "e2e-aws-ocp-${openshift//./}"             "make test-e2e"         "aws" "false" "ipi-aws" ""
   print_single_test    "conformance-aws-ocp-${openshift//./}"     "make test-conformance" "aws" "false" "ipi-aws" ""
   print_single_test    "reconciler-aws-ocp-${openshift//./}"      "make test-reconciler"  "aws" "false" "ipi-aws" ""
 
   if [[ "$generate_continuous" == true ]]; then
-    print_single_test "e2e-aws-ocp-${openshift//./}-continuous"  "make test-e2e"          "aws" "false" "ipi-aws" "0 */12 * * 1-5"
+    print_single_test "e2e-aws-ocp-${openshift//./}-continuous"  "make test-e2e"          "aws" "false" "ipi-aws" "${cron}"
   fi
 }
 
 function print_non_openshift_47_tests {
+  cron="$(generate_cron_expression)"
+
   print_single_test    "e2e-aws-ocp-${openshift//./}"             "make test-e2e"         "" "true" "generic-claim" ""
   print_single_test    "conformance-aws-ocp-${openshift//./}"     "make test-conformance" "" "true" "generic-claim" ""
   print_single_test    "reconciler-aws-ocp-${openshift//./}"      "make test-reconciler"  "" "true" "generic-claim" ""
 
   if [[ "$generate_continuous" == true ]]; then
-    print_single_test "e2e-aws-ocp-${openshift//./}-continuous"  "make test-e2e"          "" "true" "generic-claim" "0 */12 * * 1-5"
+    print_single_test "e2e-aws-ocp-${openshift//./}-continuous"  "make test-e2e"          "" "true" "generic-claim" "${cron}"
   fi
 }
 
@@ -229,7 +247,7 @@ EOF
 done
 }
 
-image_deps=$(generate_image_dependencies)
+image_deps="$(generate_image_dependencies)"
 
 print_base_images
 print_build_root
