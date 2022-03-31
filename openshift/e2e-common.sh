@@ -222,7 +222,7 @@ function run_e2e_rekt_tests(){
   echo "Replacing knative-eventing-test-eventshub image"
   sed -i -e "s|registry.ci.openshift.org/openshift/knative-.*:knative-eventing-test-eventshub|${KNATIVE_EVENTING_TEST_EVENTSHUB}|g" "$(dirname "$0")/../vendor/knative.dev/reconciler-test/pkg/eventshub/103-pod.yaml"
 
-  go_test_e2e -timeout=30m -parallel=20 ./test/rekt || failed=$?
+  go_test_e2e -timeout=1h -parallel=20 ./test/rekt || failed=$?
 
   # Wait for all test namespaces to be deleted.
   timeout_non_zero 300 '[[ $(oc get project | grep -c test-) -gt 0 ]]' || return 1
