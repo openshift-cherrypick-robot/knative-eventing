@@ -209,7 +209,7 @@ function run_e2e_rekt_tests(){
   wait_until_pods_running $EVENTING_NAMESPACE || return 2
 
 
-  go_test_e2e -timeout=30m -parallel=20 ./test/rekt || failed=$?
+  go_test_e2e -timeout=1h -parallel=20 ./test/rekt || failed=$?
 
   # Wait for all test namespaces to be deleted.
   timeout_non_zero 300 '[[ $(oc get project | grep -c test-) -gt 0 ]]' || return 1
