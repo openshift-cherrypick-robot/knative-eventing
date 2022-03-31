@@ -2,7 +2,6 @@ aliases:
   eventing-approvers:
   - alanfx
   - aliok
-  - devguyio
   - jcrossley3
   - lberk
   - matzew
@@ -11,7 +10,6 @@ aliases:
   - skonto
   eventing-reviewers:
   - aliok
-  - devguyio
   - lberk
   - matzew
   - pierdipi
