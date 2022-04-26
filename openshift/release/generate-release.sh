@@ -17,9 +17,6 @@ fi
 # the core parts
 resolve_resources config/ $output_file $image_prefix $tag
 
-# Sugar testing configuration
-cat test/config/sugar.yaml >> $output_file
-
 # InMemoryChannel folders...
 # The root folder
 resolve_resources config/channels/in-memory-channel/ crd-channel-resolved.yaml $image_prefix $tag

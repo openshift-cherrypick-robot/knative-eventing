@@ -146,6 +146,10 @@ data:
 EOF
 }
 
+function configure_sugar_controller_testing {
+ oc apply -f test/config/sugar.yaml
+}
+
 function install_serverless(){
   header "Installing Serverless Operator"
   local operator_dir=/tmp/serverless-operator
@@ -183,6 +187,9 @@ function install_knative_eventing(){
   # Wait for 5 pods to appear first
   timeout_non_zero 900 '[[ $(oc get pods -n $EVENTING_NAMESPACE --no-headers | wc -l) -lt 5 ]]' || return 1
   wait_until_pods_running $EVENTING_NAMESPACE || return 1
+
+  # Apply the testing config for the sugar controller
+  configure_sugar_controller_testing
 
   # Assert that there are no images used that are not CI images (which should all be using the $INTERNAL_REGISTRY)
   # (except for the knative-eventing-operator)
