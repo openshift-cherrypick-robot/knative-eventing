@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ -n "${ARTIFACT_DIR:-}" ]]; then
+  ARTIFACTS="${ARTIFACT_DIR}/build-${BUILD_NUMBER}"
+  export ARTIFACTS
+  mkdir -p "${ARTIFACTS}"
+fi
+
 export EVENTING_NAMESPACE="${EVENTING_NAMESPACE:-knative-eventing}"
 export SYSTEM_NAMESPACE=$EVENTING_NAMESPACE
 export ZIPKIN_NAMESPACE=$EVENTING_NAMESPACE
