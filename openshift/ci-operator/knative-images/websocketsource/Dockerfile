@@ -1,6 +1,11 @@
 # Do not edit! This file was generated via Makefile
+FROM registry.ci.openshift.org/openshift/release:golang-1.17 as builder
+
+COPY . .
+RUN make install test-install
+
 FROM openshift/origin-base
 USER 65532
 
-ADD websocketsource /usr/bin/websocketsource
+COPY --from=builder /go/bin/websocketsource /usr/bin/websocketsource
 ENTRYPOINT ["/usr/bin/websocketsource"]
