@@ -1,6 +1,11 @@
 # Do not edit! This file was generated via Makefile
+FROM registry.ci.openshift.org/openshift/release:golang-1.17 as builder
+
+COPY . .
+RUN make install test-install
+
 FROM openshift/origin-base
 USER 65532
 
-ADD mtchannel_broker /usr/bin/mtchannel_broker
+COPY --from=builder /go/bin/mtchannel_broker /usr/bin/mtchannel_broker
 ENTRYPOINT ["/usr/bin/mtchannel_broker"]
