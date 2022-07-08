@@ -7,5 +7,6 @@ RUN make install test-install
 FROM openshift/origin-base
 USER 65532
 
-COPY --from=builder /go/bin/apiserver_receive_adapter /usr/bin/apiserver_receive_adapter
-ENTRYPOINT ["/usr/bin/apiserver_receive_adapter"]
+COPY ${kodata_path} /var/run/ko
+COPY --from=builder /go/bin/${bin} /usr/bin/${bin}
+ENTRYPOINT ["/usr/bin/${bin}"]
