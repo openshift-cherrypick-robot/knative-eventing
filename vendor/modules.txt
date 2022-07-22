@@ -89,9 +89,11 @@ github.com/cncf/xds/go/xds/data/orca/v3
 github.com/cncf/xds/go/xds/type/v3
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
-# github.com/emicklei/go-restful v2.9.5+incompatible
+# github.com/emicklei/go-restful v2.9.5+incompatible => github.com/emicklei/go-restful/v3 v3.8.0
 github.com/emicklei/go-restful
-github.com/emicklei/go-restful/log
+# github.com/emicklei/go-restful/v3 v3.9.0
+## explicit
+github.com/emicklei/go-restful/v3/log
 # github.com/envoyproxy/go-control-plane v0.9.10-0.20210907150352-cf90f659a021
 github.com/envoyproxy/go-control-plane/envoy/admin/v3
 github.com/envoyproxy/go-control-plane/envoy/annotations
@@ -1292,5 +1294,6 @@ sigs.k8s.io/structured-merge-diff/v4/value
 ## explicit
 sigs.k8s.io/yaml
 # github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v0.0.0-20210511163231-5b2d2b5f6c34
+# github.com/emicklei/go-restful => github.com/emicklei/go-restful/v3 v3.8.0
 # github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.25
 # github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.11.1

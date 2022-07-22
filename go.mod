@@ -8,6 +8,7 @@ require (
 	github.com/cloudevents/sdk-go/observability/opencensus/v2 v2.4.1
 	github.com/cloudevents/sdk-go/sql/v2 v2.8.0
 	github.com/cloudevents/sdk-go/v2 v2.8.0
+	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.6
 	github.com/google/gofuzz v1.2.0
@@ -52,6 +53,8 @@ require (
 
 replace (
 	github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v0.0.0-20210511163231-5b2d2b5f6c34
+	// Enforce a version for CVE-2022-1996
+	github.com/emicklei/go-restful => github.com/emicklei/go-restful/v3 v3.8.0
 	github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.25
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.11.1
 )
