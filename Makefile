@@ -18,6 +18,7 @@ install:
 	done
 	go build -o $(GOPATH)/bin/mtbroker_ingress ./cmd/broker/ingress/
 	go build -o $(GOPATH)/bin/mtbroker_filter ./cmd/broker/filter/
+	go build -o $(GOPATH)/bin/storage_version_migration ./vendor/knative.dev/pkg/apiextensions/storageversion/cmd/migrate
 .PHONY: install
 
 test-install:
@@ -66,6 +67,7 @@ generate-dockerfiles:
 	./openshift/ci-operator/generate-dockerfiles.sh openshift/ci-operator/knative-images $(CORE_IMAGES)
 	./openshift/ci-operator/generate-dockerfiles.sh openshift/ci-operator/knative-images mtbroker_ingress
 	./openshift/ci-operator/generate-dockerfiles.sh openshift/ci-operator/knative-images mtbroker_filter
+	./openshift/ci-operator/generate-dockerfiles.sh openshift/ci-operator/knative-images storage_version_migration
 	rm -rf openshift/ci-operator/knative-test-images/*
 	./openshift/ci-operator/generate-dockerfiles.sh openshift/ci-operator/knative-test-images $(TEST_IMAGES)
 .PHONY: generate-dockerfiles

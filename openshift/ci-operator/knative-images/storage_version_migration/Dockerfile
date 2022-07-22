@@ -7,5 +7,5 @@ RUN make install test-install
 FROM openshift/origin-base
 USER 65532
 
-COPY --from=builder /go/bin/migrate /usr/bin/migrate
-ENTRYPOINT ["/usr/bin/migrate"]
+COPY --from=builder /go/bin/storage_version_migration /usr/bin/storage_version_migration
+ENTRYPOINT ["/usr/bin/storage_version_migration"]
