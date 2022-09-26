@@ -31,7 +31,6 @@ import (
 	. "github.com/cloudevents/sdk-go/v2/test"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
-	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	pkgTest "knative.dev/pkg/test"
 	"knative.dev/pkg/tracker"
@@ -163,14 +162,14 @@ func TestSinkBindingV1CronJob(t *testing.T) {
 	client.CreateSinkBindingV1OrFail(sinkBinding)
 
 	message := fmt.Sprintf("msg %s TestSinkBindingCronJob", uuid.NewUUID())
-	client.CreateCronJobOrFail(&batchv1beta1.CronJob{
+	client.CreateCronJobOrFail(&batchv1.CronJob{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: client.Namespace,
 			Name:      deploymentName,
 		},
-		Spec: batchv1beta1.CronJobSpec{
+		Spec: batchv1.CronJobSpec{
 			Schedule: "* * * * *",
-			JobTemplate: batchv1beta1.JobTemplateSpec{
+			JobTemplate: batchv1.JobTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
 						"foo": "bar",
